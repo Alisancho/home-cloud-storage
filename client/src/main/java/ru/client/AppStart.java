@@ -8,6 +8,9 @@ import javafx.stage.Stage;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 
+import javax.lang.model.element.Element;
+import javax.xml.xpath.XPath;
+import javax.xml.xpath.XPathFactory;
 import java.io.IOException;
 
 public class AppStart extends Application {
@@ -17,11 +20,10 @@ public class AppStart extends Application {
         final Parent panel = FXMLLoader.load(getClass().getResource("/sample.fxml"));
         final Scene scene = new Scene(panel, 1200, 700);
         stage.setTitle("Client cloud");
-        scene.getStylesheets().add(getClass().getResource("/fontstyle.css").toExternalForm());
+      //  scene.getStylesheets().add(getClass().getResource("/fontstyle.css").toExternalForm());
         stage.setScene(scene);
         stage.setResizable(false);
         stage.show();
-
     }
 
     public static void main(String[] args) {
