@@ -1,6 +1,7 @@
 package ru.client.service;
 
 import java.io.*;
+import java.text.DecimalFormat;
 import java.util.Arrays;
 import java.util.concurrent.CompletableFuture;
 
@@ -17,7 +18,7 @@ public class WorkWithFilesServiceImpl {
                 obList.remove(0, obList.size());
                 final var files = new File(filePath).listFiles();
                 Arrays.stream(files).forEach(file ->
-                        obList.add(new OneFile(FileType.getTypeFile(file), file.getName(), String.valueOf((double) file.length() / 1024)))
+                        obList.add(new OneFile(FileType.getTypeFile(file), file.getName(), String.format("%.2f",(double) file.length() / 1024) + " kb"))
                 );
 
 //                final var file = new File("/Users/aleksandrmutovkin/IdeaProjects/home-cloud-storage/client/src/main/resources/fontstyle.css");

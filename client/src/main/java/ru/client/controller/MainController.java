@@ -13,22 +13,23 @@ import javafx.scene.layout.VBox;
 import javafx.util.Callback;
 import ru.client.entity.OneFile;
 import ru.client.service.WorkWithFilesServiceImpl;
+import ru.home.entity.UserCloud;
 
 import java.util.ResourceBundle;
 
-public class MainController {
+public class MainController implements MainCiontrollerInt {
     private String pathLocal;
-    final ObservableList<OneFile> filesListClient = FXCollections.observableArrayList();
-    final TreeItem<OneFile> rootClient = new RecursiveTreeItem<OneFile>(filesListClient, RecursiveTreeObject::getChildren);
-    final JFXTreeTableColumn<OneFile, String> typeColClient = new JFXTreeTableColumn<>("Type");
-    final JFXTreeTableColumn<OneFile, String> nameColClient = new JFXTreeTableColumn<>("File name");
-    final JFXTreeTableColumn<OneFile, String> sizeColClient = new JFXTreeTableColumn<>("Size");
+    final private ObservableList<OneFile> filesListClient = FXCollections.observableArrayList();
+    final private TreeItem<OneFile> rootClient = new RecursiveTreeItem<OneFile>(filesListClient, RecursiveTreeObject::getChildren);
+    final private JFXTreeTableColumn<OneFile, String> typeColClient = new JFXTreeTableColumn<>(COL_1);
+    final private JFXTreeTableColumn<OneFile, String> nameColClient = new JFXTreeTableColumn<>(COL_2);
+    final private JFXTreeTableColumn<OneFile, String> sizeColClient = new JFXTreeTableColumn<>(COL_3);
 
-    final ObservableList<OneFile> filesListServer = FXCollections.observableArrayList();
-    final TreeItem<OneFile> rootServer = new RecursiveTreeItem<OneFile>(filesListClient, RecursiveTreeObject::getChildren);
-    final JFXTreeTableColumn<OneFile, String> typeColServer = new JFXTreeTableColumn<>("Type");
-    final JFXTreeTableColumn<OneFile, String> nameColServer = new JFXTreeTableColumn<>("File name");
-    final JFXTreeTableColumn<OneFile, String> sizeColServer = new JFXTreeTableColumn<>("Size");
+    final private ObservableList<OneFile> filesListServer = FXCollections.observableArrayList();
+    final private TreeItem<OneFile> rootServer = new RecursiveTreeItem<OneFile>(filesListClient, RecursiveTreeObject::getChildren);
+    final private JFXTreeTableColumn<OneFile, String> typeColServer = new JFXTreeTableColumn<>(COL_1);
+    final private JFXTreeTableColumn<OneFile, String> nameColServer = new JFXTreeTableColumn<>(COL_2);
+    final private JFXTreeTableColumn<OneFile, String> sizeColServer = new JFXTreeTableColumn<>(COL_3);
 
     @FXML
     private ResourceBundle resources;
@@ -56,6 +57,22 @@ public class MainController {
 
     @FXML
     private JFXTextField localAddressTextField;
+
+    @FXML
+    private JFXButton goToCatalog;
+
+    @FXML
+    private JFXTextField loginTextField;
+
+    @FXML
+    private JFXPasswordField passTextField;
+
+    @FXML
+    private JFXTextField hostTextField;
+
+    @FXML
+    private JFXTextField portTextField;
+
 
     @FXML
     void initialize() throws InterruptedException {
@@ -90,6 +107,7 @@ public class MainController {
         tableHome.setShowRoot(false);
 
         connectButton.setOnAction(event -> {
+            final var userCloud = new UserCloud(loginTextField.getText(), passTextField.getText());
             mainBox.getChildren().remove(sbur);
             disconnectButton.setVisible(true);
             WorkWithFilesServiceImpl.getFiles(filesListClient, localAddressTextField.getText());
@@ -98,9 +116,14 @@ public class MainController {
         disconnectButton.setOnAction(event -> {
             mainBox.getChildren().add(0, sbur);
             disconnectButton.setVisible(false);
+            filesListServer.remove(0, filesListServer.size());
         });
 
         upButton.setOnAction(event -> {
+        });
+
+        goToCatalog.setOnAction(event -> {
+            WorkWithFilesServiceImpl.getFiles(filesListClient, localAddressTextField.getText());
         });
 
     }
