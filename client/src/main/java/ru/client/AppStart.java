@@ -7,6 +7,12 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import java.io.IOException;
 
+/**
+ * VM options
+ * --module-path
+ * "/Library/Java/JavaVirtualMachines/javafx-sdk-14.0.1/lib"
+ * --add-modules=javafx.controls,javafx.fxml
+ */
 public class AppStart extends Application {
 
     @Override
