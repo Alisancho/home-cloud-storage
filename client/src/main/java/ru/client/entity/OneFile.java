@@ -4,7 +4,7 @@ import com.jfoenix.controls.datamodels.treetable.RecursiveTreeObject;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 import org.jetbrains.annotations.NotNull;
-import ru.home.entity.FileType;
+import ru.home.entity.catalog.FileType;
 
 public class OneFile extends RecursiveTreeObject<OneFile> {
 

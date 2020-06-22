@@ -1,10 +1,11 @@
-package ru.home.entity;
+package ru.home.entity.catalog;
 
 import org.jetbrains.annotations.NotNull;
 
 import java.io.File;
+import java.io.Serializable;
 
-public enum FileType {
+public enum FileType implements Serializable {
     FILE("FILE"),
     DIRECTORY("DIRECTORY");
 
