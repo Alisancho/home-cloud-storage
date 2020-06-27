@@ -1,13 +1,12 @@
 package ru.client.service;
 
 import java.io.*;
-import java.text.DecimalFormat;
 import java.util.Arrays;
 import java.util.concurrent.CompletableFuture;
 
 import javafx.collections.ObservableList;
 import org.jetbrains.annotations.NotNull;
-import ru.home.entity.FileType;
+import ru.home.entity.catalog.FileType;
 import ru.client.entity.OneFile;
 
 public class WorkWithFilesServiceImpl {
