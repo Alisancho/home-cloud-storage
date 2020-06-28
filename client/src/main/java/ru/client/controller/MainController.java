@@ -198,6 +198,7 @@ public class MainController implements MainCiontrollerInt {
 
         disconnectButton.setOnAction(event -> {
             funDis.apply(null);
+            nettyClient.stop();
         });
 
         upButton.setOnAction(event -> {

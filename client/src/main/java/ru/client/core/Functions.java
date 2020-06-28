@@ -14,17 +14,7 @@ import javafx.scene.layout.VBox;
 import ru.client.entity.OneFileFX;
 
 public class Functions {
-    /**
-     * Функция для дисконнекта
-     */
-    public static Function4<HBox, JFXButton, ObservableList<OneFileFX>, VBox, Class<Void>> errorConnect = (mainBox, disconnectButton, filesListServer, sbur) -> {
-        mainBox.getChildren().add(0, sbur);
-        disconnectButton.setVisible(false);
-        filesListServer.remove(0, filesListServer.size());
-        return Void.TYPE;
-    };
-
-
+    
     public static Function8<JFXButton, JFXButton, JFXButton, HBox, JFXButton, ObservableList<OneFileFX>, VBox, Throwable, Class<Void>> functionConnection = (putToServerButton, getFromServerButton, deleteFromServerButton, mainBox, disconnectButton, filesListServer, sbur, error) -> {
         Platform.runLater(
                 () -> {
