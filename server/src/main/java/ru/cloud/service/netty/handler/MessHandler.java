@@ -26,12 +26,13 @@ public class MessHandler extends ChannelInboundHandlerAdapter {
     @Override
     public void channelActive(ChannelHandlerContext ctx) {
         log.info("Client connected");
-//        final var files = new File(path).listFiles();
-//        final var setFile = Arrays.stream(files)
-//                .filter(k -> !k.isHidden())
-//                .map(o -> new OneServerFile(FileType.getTypeFile(o), o.getName(), String.format("%.2f", (double) o.length() / 1024) + " kb"))
-//                .collect(Collectors.toSet());
-//        ctx.writeAndFlush(new ContentsDirectory(setFile));
+        //throw new RuntimeException("Lppppp");
+        final var files = new File(path).listFiles();
+        final var setFile = Arrays.stream(files)
+                .filter(k -> !k.isHidden())
+                .map(o -> new OneServerFile(FileType.getTypeFile(o), o.getName(), String.format("%.2f", (double) o.length() / 1024) + " kb"))
+                .collect(Collectors.toSet());
+        ctx.writeAndFlush(new ContentsDirectory(setFile));
 
     }
 
@@ -48,7 +49,6 @@ public class MessHandler extends ChannelInboundHandlerAdapter {
                         e.printStackTrace();
                         ctx.writeAndFlush(ERROR_NO_FILE);
                     }
-
                 }
                 case PUT -> {
                     log.info(oneTask.task().taskType());
@@ -64,7 +64,6 @@ public class MessHandler extends ChannelInboundHandlerAdapter {
                         log.error(e.getMessage());
                         ctx.writeAndFlush(ERROR_NO_FILE);
                     }
-
                 }
                 case OPTIONS -> {
                     log.info(oneTask.task().taskType());

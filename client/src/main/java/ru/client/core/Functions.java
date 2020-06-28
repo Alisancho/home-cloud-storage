@@ -2,12 +2,16 @@ package ru.client.core;
 
 import com.jfoenix.controls.JFXButton;
 import com.jfoenix.controls.JFXTreeTableView;
+import io.vavr.Function3;
 import io.vavr.Function4;
+import io.vavr.Function7;
+import io.vavr.Function8;
+import javafx.application.Platform;
 import javafx.collections.ObservableList;
+import javafx.fxml.FXML;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import ru.client.entity.OneFileFX;
-import ru.client.service.netty.NettyClientServiceImpl;
 
 public class Functions {
     /**
@@ -20,6 +24,32 @@ public class Functions {
         return Void.TYPE;
     };
 
-    public static void errorConnect(JFXTreeTableView<OneFileFX> tableHome, NettyClientServiceImpl nioClient) {
-    }
+
+    public static Function8<JFXButton, JFXButton, JFXButton, HBox, JFXButton, ObservableList<OneFileFX>, VBox, Throwable, Class<Void>> functionConnection = (putToServerButton, getFromServerButton, deleteFromServerButton, mainBox, disconnectButton, filesListServer, sbur, error) -> {
+        Platform.runLater(
+                () -> {
+                    mainBox.getChildren().remove(sbur);
+                    putToServerButton.setDisable(false);
+                    getFromServerButton.setDisable(false);
+                    deleteFromServerButton.setDisable(false);
+                    disconnectButton.setVisible(true);
+                }
+        );
+        return Void.TYPE;
+    };
+
+    public static Function8<JFXButton, JFXButton, JFXButton, HBox, JFXButton, ObservableList<OneFileFX>, VBox, Throwable, Class<Void>> functionDisconnection = (putToServerButton, getFromServerButton, deleteFromServerButton, mainBox, disconnectButton, filesListServer, sbur, error) -> {
+        Platform.runLater(
+                () -> {
+                    putToServerButton.setDisable(true);
+                    getFromServerButton.setDisable(true);
+                    deleteFromServerButton.setDisable(true);
+                    mainBox.getChildren().add(0, sbur);
+                    disconnectButton.setVisible(false);
+                    filesListServer.remove(0, filesListServer.size());
+                }
+        );
+        return Void.TYPE;
+    };
+
 }

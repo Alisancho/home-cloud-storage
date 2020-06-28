@@ -9,6 +9,7 @@ import io.netty.channel.socket.nio.NioSocketChannel;
 import io.netty.handler.codec.serialization.ClassResolvers;
 import io.netty.handler.codec.serialization.ObjectDecoder;
 import io.netty.handler.codec.serialization.ObjectEncoder;
+import io.vavr.Function1;
 import javafx.collections.ObservableList;
 import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
@@ -27,16 +28,16 @@ public class NettyClient {
                        @NotNull final Integer port,
                        @NotNull final ObservableList<OneFileFX> filesListServer,
                        @NotNull final ObservableList<OneFileFX> filesListClient,
-                       @NotNull final JFXTextField localAddressTextField) throws InterruptedException {
+                       @NotNull final JFXTextField localAddressTextField) throws Exception {
         this.clientHandler = new ClientHandler(filesListServer, filesListClient, localAddressTextField);
         this.host = host;
         this.port = port;
+
     }
 
-    public void run() {
+    public void run(@NotNull final Function1<Throwable,Class<Void>> f) throws Exception {
         EventLoopGroup group = new NioEventLoopGroup();
-        try {
-            new Bootstrap().group(group)
+         var bootstrap =   new Bootstrap().group(group)
                     .channel(NioSocketChannel.class)
                     .handler(new ChannelInitializer<SocketChannel>() {
                         @Override
@@ -47,19 +48,20 @@ public class NettyClient {
                             pipeline.addLast(clientHandler);
                         }
                     })
-                    .connect(host, port)
-                    .sync()
+                    .connect(host, port);
+        f.apply(null);
+        bootstrap.sync()
                     .channel()
                     .closeFuture()
                     .sync();
 
-        } catch (Exception e) {
-            log.error(e.getMessage());
-        } finally {
-            group.shutdownGracefully();
-        }
     }
+
     public void sendMess(NettyMess msg) {
         clientHandler.sendMessage(msg);
+    }
+
+    public void stop() {
+        clientHandler.stop();
     }
 }
