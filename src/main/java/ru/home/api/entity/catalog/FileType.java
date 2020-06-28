@@ -1,11 +1,11 @@
-package ru.home.entity.catalog;
+package ru.home.api.entity.catalog;
 
 import org.jetbrains.annotations.NotNull;
+import ru.home.api.entity.NettyMess;
 
 import java.io.File;
-import java.io.Serializable;
 
-public enum FileType implements Serializable {
+public enum FileType implements NettyMess {
     FILE("FILE"),
     DIRECTORY("DIRECTORY");
 

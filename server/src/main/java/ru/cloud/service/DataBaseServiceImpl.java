@@ -1,6 +1,6 @@
 package ru.cloud.service;
 
-import ru.home.entity.UserCloud;
+import ru.home.api.entity.auth.UserCloud;
 
 import java.util.Map;
 
