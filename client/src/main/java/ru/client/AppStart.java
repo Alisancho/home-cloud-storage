@@ -5,6 +5,8 @@ import javafx.scene.Scene;
 import javafx.stage.Stage;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
+import ru.client.controller.MainController;
+
 import java.io.IOException;
 
 /**
@@ -28,5 +30,10 @@ public class AppStart extends Application {
 
     public static void main(String[] args) {
         launch();
+    }
+
+    @Override
+    protected Object clone() throws CloneNotSupportedException {
+        return super.clone();
     }
 }

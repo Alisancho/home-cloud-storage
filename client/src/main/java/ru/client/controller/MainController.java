@@ -1,8 +1,5 @@
 package ru.client.controller;
 
-import akka.actor.ActorSystem;
-import akka.stream.ActorMaterializer;
-import akka.stream.Materializer;
 import com.jfoenix.controls.*;
 import com.jfoenix.controls.datamodels.treetable.RecursiveTreeObject;
 import io.vavr.control.Option;
@@ -17,25 +14,27 @@ import javafx.scene.layout.VBox;
 import javafx.util.Callback;
 import ru.client.entity.OneFileFX;
 import ru.client.service.WorkWithFilesServiceImpl;
+import ru.client.service.netty.NettyClient;
 import ru.client.service.netty.NettyClientServiceImpl;
+import ru.client.service.netty.NewClient;
+import ru.home.api.entity.ErrorType;
 import ru.home.api.entity.auth.UserCloud;
 import ru.home.api.entity.catalog.ContentsDirectory;
 import ru.home.api.entity.data.OneTask;
-import scala.concurrent.ExecutionContextExecutor;
 
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.nio.file.StandardOpenOption;
 import java.util.ResourceBundle;
 import java.util.concurrent.CompletableFuture;
 
-import static ru.home.api.entity.TaskType.OPTIONS;
+import static ru.home.api.entity.ErrorType.ERROR_MESS;
+import static ru.home.api.entity.TaskType.*;
 
 public class MainController implements MainCiontrollerInt {
-    private String pathLocal;
-    private NettyClientServiceImpl nioClient;
-
-    final static ActorSystem system = ActorSystem.create();
-    final static Materializer materializer = ActorMaterializer.create(system);
-    final static ExecutionContextExecutor exception = system.dispatcher();
+    public static NettyClientServiceImpl nioClient;
+//    public static NettyClient nettyClient;
 
     final private ObservableList<OneFileFX> filesListClient = FXCollections.observableArrayList();
     final private TreeItem<OneFileFX> rootClient = new RecursiveTreeItem<OneFileFX>(filesListClient, RecursiveTreeObject::getChildren);
@@ -48,6 +47,15 @@ public class MainController implements MainCiontrollerInt {
     final private JFXTreeTableColumn<OneFileFX, String> typeColServer = new JFXTreeTableColumn<>(COL_1);
     final private JFXTreeTableColumn<OneFileFX, String> nameColServer = new JFXTreeTableColumn<>(COL_2);
     final private JFXTreeTableColumn<OneFileFX, String> sizeColServer = new JFXTreeTableColumn<>(COL_3);
+
+    @FXML
+    private JFXButton putToServerButton;
+
+    @FXML
+    private JFXButton getFromServerButton;
+
+    @FXML
+    private JFXButton deleteFromServerButton;
 
     @FXML
     private JFXButton connectButton;
@@ -160,24 +168,45 @@ public class MainController implements MainCiontrollerInt {
          */
         connectButton.setOnAction(event -> {
             try {
-                nioClient = new NettyClientServiceImpl(hostTextField.getText(), Integer.parseInt(portTextField.getText()));
-//                final var userCloud = new UserCloud(loginTextField.getText(), passTextField.getText());
+                 nioClient = new NettyClientServiceImpl(hostTextField.getText(), Integer.parseInt(portTextField.getText()));
+                final var userCloud = new UserCloud(loginTextField.getText(), passTextField.getText());
                 mainBox.getChildren().remove(sbur);
                 disconnectButton.setVisible(true);
 
                 WorkWithFilesServiceImpl.getFiles(filesListClient, localAddressTextField.getText());
-
+                this.nioClient.sendMsg(new OneTask(OPTIONS, Option.none(), Option.none()));
 
                 CompletableFuture.runAsync(() -> {
                     try {
                         while (true) {
                             final var newMess = nioClient.readObject();
-                            if (newMess instanceof OneTask oneTask) {
-                                System.out.println("LPLPLPLPPL");
-                            }
                             if (newMess instanceof ContentsDirectory contentsDirectory) {
                                 System.out.println("Получен список файлов" + contentsDirectory.toString());
                                 WorkWithFilesServiceImpl.getFiles(filesListServer, contentsDirectory.files());
+
+                            }
+                            if (newMess instanceof OneTask oneTask) {
+                                switch (oneTask.task()) {
+                                    case GET -> {
+                                        Files.write(Paths.get(localAddressTextField.getText() + "/" + oneTask.fileName().get()), oneTask.data().get(), StandardOpenOption.CREATE);
+                                        WorkWithFilesServiceImpl.getFiles(filesListClient, localAddressTextField.getText());
+                                    }
+                                    default -> {
+
+                                    }
+                                }
+                            }
+                            if (newMess instanceof ErrorType errorType) {
+                                switch (errorType) {
+                                    case ERROR_NO -> {
+                                        this.nioClient.sendMsg(new OneTask(OPTIONS, Option.none(), Option.none()));
+                                    }
+                                    case ERROR_MESS -> {
+                                        System.out.println(ERROR_MESS.errorType());
+                                    }
+                                    default -> {
+                                    }
+                                }
                             }
                         }
                     } catch (ClassNotFoundException | IOException e) {
@@ -187,12 +216,9 @@ public class MainController implements MainCiontrollerInt {
                     }
                 });
 
-            } catch (IOException e) {
-                e.printStackTrace();
             } catch (Exception e) {
                 e.printStackTrace();
             }
-
 
         });
 
@@ -210,8 +236,37 @@ public class MainController implements MainCiontrollerInt {
             WorkWithFilesServiceImpl.getFiles(filesListClient, localAddressTextField.getText());
         });
 
-        goToCatalog.setOnAction(event -> {
-            WorkWithFilesServiceImpl.getFiles(filesListClient, localAddressTextField.getText());
+
+        putToServerButton.setOnAction(event -> {
+            try {
+                final var fileLocal = tableHome.getSelectionModel().getSelectedItem().getValue();
+                if (fileLocal.fileType.get().equals("FILE")) {
+                    final var arrB = Files.readAllBytes(Paths.get(localAddressTextField.getText() + "/" + fileLocal.fileName.get()));
+                    this.nioClient.sendMsg(
+                            new OneTask(PUT, Option.of(fileLocal.fileName.get()), Option.of(arrB))
+                    );
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        });
+
+        getFromServerButton.setOnAction(event -> {
+            try {
+                final var fileLocal = tableServer.getSelectionModel().getSelectedItem().getValue();
+                if (fileLocal.fileType.get().equals("FILE")) {
+                    this.nioClient.sendMsg(
+                            new OneTask(GET, Option.of(fileLocal.fileName.get()), Option.none())
+                    );
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        });
+        deleteFromServerButton.setOnAction(event -> {
+            this.nioClient.sendMsg(
+                    new OneTask(DELETE, Option.of(tableServer.getSelectionModel().getSelectedItem().getValue().fileName.get()), Option.none())
+            );
         });
     }
 }
