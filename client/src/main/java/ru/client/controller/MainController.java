@@ -184,14 +184,16 @@ public class MainController implements MainCiontrollerInt {
                     try {
                         nettyClient.run(funCon);
                     } catch (Exception e) {
-                        e.printStackTrace();
+                        log.error(e.getMessage());
+
+                    }finally {
+                        nettyClient.stop();
                         funDis.apply(null);
                     }
                 });
         });
 
         disconnectButton.setOnAction(event -> {
-            funDis.apply(null);
             nettyClient.stop();
         });
 

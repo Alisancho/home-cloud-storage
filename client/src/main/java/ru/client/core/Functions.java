@@ -31,6 +31,7 @@ public class Functions {
     public static Function8<JFXButton, JFXButton, JFXButton, HBox, JFXButton, ObservableList<OneFileFX>, VBox, Throwable, Class<Void>> functionDisconnection = (putToServerButton, getFromServerButton, deleteFromServerButton, mainBox, disconnectButton, filesListServer, sbur, error) -> {
         Platform.runLater(
                 () -> {
+                    System.out.println("kkkkk");
                     putToServerButton.setDisable(true);
                     getFromServerButton.setDisable(true);
                     deleteFromServerButton.setDisable(true);

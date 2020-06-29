@@ -22,6 +22,7 @@ public class NettyClient {
     private final ClientHandler clientHandler;
     private final String host;
     private final Integer port;
+    private final NioEventLoopGroup nioEventLoopGroup;
 
 
     public NettyClient(@NotNull final String host,
@@ -29,6 +30,7 @@ public class NettyClient {
                        @NotNull final ObservableList<OneFileFX> filesListServer,
                        @NotNull final ObservableList<OneFileFX> filesListClient,
                        @NotNull final JFXTextField localAddressTextField) {
+        this.nioEventLoopGroup = new NioEventLoopGroup();
         this.clientHandler = new ClientHandler(filesListServer, filesListClient, localAddressTextField);
         this.host = host;
         this.port = port;
@@ -36,7 +38,8 @@ public class NettyClient {
     }
 
     public void run(@NotNull final Function1<Throwable, Class<Void>> f) throws Exception {
-        final var bootstrap = new Bootstrap().group(new NioEventLoopGroup())
+
+        final var bootstrap = new Bootstrap().group(this.nioEventLoopGroup)
                 .channel(NioSocketChannel.class)
                 .handler(new ChannelInitializer<SocketChannel>() {
                     @Override
@@ -53,7 +56,6 @@ public class NettyClient {
                 .channel()
                 .closeFuture()
                 .sync();
-
         throw new RuntimeException("Разрыв соединения");
     }
 
@@ -62,6 +64,6 @@ public class NettyClient {
     }
 
     public void stop() {
-        clientHandler.stop();
+        nioEventLoopGroup.shutdownGracefully();
     }
 }
