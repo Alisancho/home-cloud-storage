@@ -196,10 +196,7 @@ public class MainController implements MainCiontrollerInt {
                         nettyClient.stop();
                     }
                 });
-            } else {
-                log.error("ededededededededededededed");
             }
-
         });
 
         disconnectButton.setOnAction(event -> {
