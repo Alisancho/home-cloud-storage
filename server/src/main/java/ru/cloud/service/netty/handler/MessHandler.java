@@ -24,7 +24,6 @@ import static ru.home.api.entity.ErrorType.*;
 
 @Slf4j
 public class MessHandler extends ChannelInboundHandlerAdapter {
-    //    final private String path = "/Users/aleksandrmutovkin/IdeaProjects/home-cloud-storage/server/src/main/resources/storage/user";
     private Optional<UserTable> userTable = Optional.empty();
 
     @Override

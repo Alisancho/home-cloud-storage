@@ -175,7 +175,7 @@ public class MainController implements MainCiontrollerInt {
          */
         connectButton.setOnAction(event -> {
             if (!"".equals(loginTextField.getText())) {
-                var user = new UserCloud(loginTextField.getText(), passTextField.getText());
+                final var user = new UserCloud(loginTextField.getText(), passTextField.getText());
                 CompletableFuture.runAsync(() -> {
                     try {
                         nettyClient = new NettyClient(
@@ -254,8 +254,6 @@ public class MainController implements MainCiontrollerInt {
                 e.printStackTrace();
             }
         });
-
-
         WorkWithFilesServiceImpl.getFiles(filesListClient, localAddressTextField.getText());
     }
 }
