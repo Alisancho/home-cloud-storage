@@ -6,6 +6,7 @@ import java.io.Serializable;
 
 public enum ErrorType implements NettyMess {
     ERROR_NO("Успех"),
+    AUTH_OK("Успешная авторизация"),
     ERROR_USER("Нет такого пользователя"),
     ERROR_PASS("Неверный пароль"),
     ERROR_CONNECT("Розрыв соединения"),

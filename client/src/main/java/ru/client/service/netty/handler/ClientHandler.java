@@ -3,6 +3,7 @@ package ru.client.service.netty.handler;
 import com.jfoenix.controls.JFXTextField;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
+import io.vavr.Function1;
 import io.vavr.control.Option;
 import javafx.collections.ObservableList;
 import lombok.extern.slf4j.Slf4j;
@@ -27,11 +28,15 @@ public class ClientHandler extends ChannelInboundHandlerAdapter {
     final private ObservableList<OneFileFX> filesListServer;
     final private ObservableList<OneFileFX> filesListClient;
     final private JFXTextField localAddressTextField;
+    final private Function1<Throwable, Class<Void>> funOn;
     private ChannelHandlerContext ctxMain;
+
 
     public ClientHandler(@NotNull final ObservableList<OneFileFX> filesListServer,
                          @NotNull final ObservableList<OneFileFX> filesListClient,
-                         @NotNull final JFXTextField localAddressTextField) {
+                         @NotNull final JFXTextField localAddressTextField,
+                         @NotNull final Function1<Throwable, Class<Void>> funOn) {
+        this.funOn = funOn;
         this.filesListServer = filesListServer;
         this.filesListClient = filesListClient;
         this.localAddressTextField = localAddressTextField;
@@ -76,6 +81,10 @@ public class ClientHandler extends ChannelInboundHandlerAdapter {
                 }
                 case ERROR_MESS -> {
                     log.error(ERROR_MESS.errorType());
+                }
+                case AUTH_OK -> {
+                    funOn.apply(null);
+                    ctx.writeAndFlush(new OneTask(OPTIONS, Option.none(), Option.none()));
                 }
                 default -> {
                 }

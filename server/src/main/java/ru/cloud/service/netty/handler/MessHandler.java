@@ -43,7 +43,7 @@ public class MessHandler extends ChannelInboundHandlerAdapter {
                 } else {
                     log.info("Успешная авторизация " + userCloud.login());
                     this.userTable = op;
-                    ctx.writeAndFlush(ERROR_NO);
+                    ctx.writeAndFlush(AUTH_OK);
                 }
             } else {
                 throw new RuntimeException("Авторизация не пройдена");

@@ -174,26 +174,32 @@ public class MainController implements MainCiontrollerInt {
          * Кнопка коннекта
          */
         connectButton.setOnAction(event -> {
-            var user = new UserCloud(loginTextField.getText(), passTextField.getText());
-            nettyClient = new NettyClient(
-                    hostTextField.getText(),
-                    Integer.parseInt(portTextField.getText()),
-                    filesListServer,
-                    filesListClient,
-                    localAddressTextField
-            );
-            CompletableFuture.runAsync(() -> {
-                try {
-                    nettyClient.run(funCon,user);
-                } catch (java.net.ConnectException e) {
-                    log.error(e.getMessage());
-                } catch (Exception e) {
-                    log.error(e.getMessage());
-                    funDis.apply(null);
-                } finally {
-                    nettyClient.stop();
-                }
-            });
+            if (!"".equals(loginTextField.getText())) {
+                var user = new UserCloud(loginTextField.getText(), passTextField.getText());
+                CompletableFuture.runAsync(() -> {
+                    try {
+                        nettyClient = new NettyClient(
+                                hostTextField.getText(),
+                                Integer.parseInt(portTextField.getText()),
+                                filesListServer,
+                                filesListClient,
+                                localAddressTextField,
+                                funCon
+                        );
+                        nettyClient.run(user);
+                    } catch (java.net.ConnectException e) {
+                        log.error(e.getMessage());
+                    } catch (Exception e) {
+                        log.error(e.getMessage());
+                        funDis.apply(null);
+                    } finally {
+                        nettyClient.stop();
+                    }
+                });
+            } else {
+                log.error("ededededededededededededed");
+            }
+
         });
 
         disconnectButton.setOnAction(event -> {

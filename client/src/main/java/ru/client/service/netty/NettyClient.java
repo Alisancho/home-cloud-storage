@@ -21,25 +21,17 @@ import ru.home.api.entity.auth.UserCloud;
 @Slf4j
 public class NettyClient {
     private final ClientHandler clientHandler;
-    private final String host;
-    private final Integer port;
     private final NioEventLoopGroup nioEventLoopGroup;
-
+    private final ChannelFuture channelFuture;
 
     public NettyClient(@NotNull final String host,
                        @NotNull final Integer port,
                        @NotNull final ObservableList<OneFileFX> filesListServer,
                        @NotNull final ObservableList<OneFileFX> filesListClient,
-                       @NotNull final JFXTextField localAddressTextField) {
+                       @NotNull final JFXTextField localAddressTextField,
+                       @NotNull final Function1<Throwable, Class<Void>> funOn) throws Exception {
         this.nioEventLoopGroup = new NioEventLoopGroup();
-        this.clientHandler = new ClientHandler(filesListServer, filesListClient, localAddressTextField);
-        this.host = host;
-        this.port = port;
-
-    }
-
-    public void run(@NotNull final Function1<Throwable, Class<Void>> f, @NotNull final UserCloud userCloud) throws Exception {
-
+        this.clientHandler = new ClientHandler(filesListServer, filesListClient, localAddressTextField,funOn);
         final var bootstrap = new Bootstrap().group(this.nioEventLoopGroup)
                 .channel(NioSocketChannel.class)
                 .handler(new ChannelInitializer<SocketChannel>() {
@@ -53,13 +45,15 @@ public class NettyClient {
                 })
                 .connect(host, port);
 
-        var localVar = bootstrap.sync()
+        this.channelFuture = bootstrap.sync()
                 .channel()
                 .closeFuture();
-        sendMess(userCloud);
-        f.apply(null);
-        localVar.sync();
+    }
 
+    public void run(@NotNull final UserCloud userCloud) throws Exception {
+        log.info(userCloud.toString());
+        sendMess(userCloud);
+        channelFuture.sync();
         throw new RuntimeException("Разрыв соединения");
     }
 
