@@ -28,33 +28,33 @@ public class NettyClient {
                        @NotNull final Integer port,
                        @NotNull final ObservableList<OneFileFX> filesListServer,
                        @NotNull final ObservableList<OneFileFX> filesListClient,
-                       @NotNull final JFXTextField localAddressTextField) throws Exception {
+                       @NotNull final JFXTextField localAddressTextField) {
         this.clientHandler = new ClientHandler(filesListServer, filesListClient, localAddressTextField);
         this.host = host;
         this.port = port;
 
     }
 
-    public void run(@NotNull final Function1<Throwable,Class<Void>> f) throws Exception {
-        EventLoopGroup group = new NioEventLoopGroup();
-         var bootstrap =   new Bootstrap().group(group)
-                    .channel(NioSocketChannel.class)
-                    .handler(new ChannelInitializer<SocketChannel>() {
-                        @Override
-                        public void initChannel(SocketChannel socketChannel) {
-                            ChannelPipeline pipeline = socketChannel.pipeline();
-                            pipeline.addLast(new ObjectEncoder());
-                            pipeline.addLast(new ObjectDecoder(ClassResolvers.cacheDisabled(null)));
-                            pipeline.addLast(clientHandler);
-                        }
-                    })
-                    .connect(host, port);
+    public void run(@NotNull final Function1<Throwable, Class<Void>> f) throws Exception {
+        final var bootstrap = new Bootstrap().group(new NioEventLoopGroup())
+                .channel(NioSocketChannel.class)
+                .handler(new ChannelInitializer<SocketChannel>() {
+                    @Override
+                    public void initChannel(SocketChannel socketChannel) {
+                        ChannelPipeline pipeline = socketChannel.pipeline();
+                        pipeline.addLast(new ObjectEncoder());
+                        pipeline.addLast(new ObjectDecoder(ClassResolvers.cacheDisabled(null)));
+                        pipeline.addLast(clientHandler);
+                    }
+                })
+                .connect(host, port);
         f.apply(null);
         bootstrap.sync()
-                    .channel()
-                    .closeFuture()
-                    .sync();
+                .channel()
+                .closeFuture()
+                .sync();
 
+        throw new RuntimeException("Разрыв соединения");
     }
 
     public void sendMess(NettyMess msg) {

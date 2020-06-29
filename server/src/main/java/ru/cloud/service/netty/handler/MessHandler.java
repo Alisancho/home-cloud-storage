@@ -25,8 +25,9 @@ public class MessHandler extends ChannelInboundHandlerAdapter {
 
     @Override
     public void channelActive(ChannelHandlerContext ctx) {
+
         log.info("Client connected");
-        //throw new RuntimeException("Lppppp");
+//        throw new RuntimeException("Lppppp");
         final var files = new File(path).listFiles();
         final var setFile = Arrays.stream(files)
                 .filter(k -> !k.isHidden())

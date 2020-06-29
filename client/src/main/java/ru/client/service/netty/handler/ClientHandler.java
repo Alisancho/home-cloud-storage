@@ -11,6 +11,7 @@ import ru.client.entity.OneFileFX;
 import ru.client.service.WorkWithFilesServiceImpl;
 import ru.home.api.entity.ErrorType;
 import ru.home.api.entity.NettyMess;
+import ru.home.api.entity.TaskType;
 import ru.home.api.entity.catalog.ContentsDirectory;
 import ru.home.api.entity.data.OneTask;
 
@@ -35,7 +36,8 @@ public class ClientHandler extends ChannelInboundHandlerAdapter {
         this.filesListClient = filesListClient;
         this.localAddressTextField = localAddressTextField;
     }
-    public void stop(){
+
+    public void stop() {
         this.ctxMain.close();
     }
 
@@ -64,14 +66,11 @@ public class ClientHandler extends ChannelInboundHandlerAdapter {
         }
         if (msg instanceof OneTask oneTask) {
             log.info("Получен OneTask");
-            switch (oneTask.task()) {
-                case GET -> {
-                    Files.write(Paths.get(localAddressTextField.getText() + "/" + oneTask.fileName().get()), oneTask.data().get(), StandardOpenOption.CREATE);
-                    WorkWithFilesServiceImpl.getFiles(filesListClient, localAddressTextField.getText());
-                }
-                default -> {
-
-                }
+            if (oneTask.task() == TaskType.GET) {
+                Files.write(Paths.get(localAddressTextField.getText() + "/" + oneTask.fileName().get()), oneTask.data().get(), StandardOpenOption.CREATE);
+                WorkWithFilesServiceImpl.getFiles(filesListClient, localAddressTextField.getText());
+            } else {
+                log.error("Ошибка в сообщении");
             }
         }
         if (msg instanceof ErrorType errorType) {

@@ -14,7 +14,7 @@ import javafx.scene.layout.VBox;
 import ru.client.entity.OneFileFX;
 
 public class Functions {
-    
+
     public static Function8<JFXButton, JFXButton, JFXButton, HBox, JFXButton, ObservableList<OneFileFX>, VBox, Throwable, Class<Void>> functionConnection = (putToServerButton, getFromServerButton, deleteFromServerButton, mainBox, disconnectButton, filesListServer, sbur, error) -> {
         Platform.runLater(
                 () -> {

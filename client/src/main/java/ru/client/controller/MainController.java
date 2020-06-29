@@ -173,7 +173,6 @@ public class MainController implements MainCiontrollerInt {
          * Кнопка коннекта
          */
         connectButton.setOnAction(event -> {
-            try {
                 nettyClient = new NettyClient(
                         hostTextField.getText(),
                         Integer.parseInt(portTextField.getText()),
@@ -189,11 +188,6 @@ public class MainController implements MainCiontrollerInt {
                         funDis.apply(null);
                     }
                 });
-
-            } catch (Exception e) {
-                e.printStackTrace();
-                funDis.apply(e);
-            }
         });
 
         disconnectButton.setOnAction(event -> {
