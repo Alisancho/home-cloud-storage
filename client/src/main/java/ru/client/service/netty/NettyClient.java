@@ -16,6 +16,7 @@ import org.jetbrains.annotations.NotNull;
 import ru.client.entity.OneFileFX;
 import ru.client.service.netty.handler.ClientHandler;
 import ru.home.api.entity.NettyMess;
+import ru.home.api.entity.auth.UserCloud;
 
 @Slf4j
 public class NettyClient {
@@ -37,7 +38,7 @@ public class NettyClient {
 
     }
 
-    public void run(@NotNull final Function1<Throwable, Class<Void>> f) throws Exception {
+    public void run(@NotNull final Function1<Throwable, Class<Void>> f, @NotNull final UserCloud userCloud) throws Exception {
 
         final var bootstrap = new Bootstrap().group(this.nioEventLoopGroup)
                 .channel(NioSocketChannel.class)
@@ -55,6 +56,8 @@ public class NettyClient {
         var localVar = bootstrap.sync()
                 .channel()
                 .closeFuture();
+log.info(userCloud.toString());
+        sendMess(userCloud);
         f.apply(null);
         localVar.sync();
 

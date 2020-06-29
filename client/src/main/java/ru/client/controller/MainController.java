@@ -18,6 +18,7 @@ import ru.client.core.Functions;
 import ru.client.entity.OneFileFX;
 import ru.client.service.WorkWithFilesServiceImpl;
 import ru.client.service.netty.NettyClient;
+import ru.home.api.entity.auth.UserCloud;
 import ru.home.api.entity.data.OneTask;
 
 import java.io.IOException;
@@ -173,26 +174,26 @@ public class MainController implements MainCiontrollerInt {
          * Кнопка коннекта
          */
         connectButton.setOnAction(event -> {
-                nettyClient = new NettyClient(
-                        hostTextField.getText(),
-                        Integer.parseInt(portTextField.getText()),
-                        filesListServer,
-                        filesListClient,
-                        localAddressTextField
-                );
-                CompletableFuture.runAsync(() -> {
-                    try {
-                        nettyClient.run(funCon);
-                    } catch (java.net.ConnectException e) {
-                        log.error(e.getMessage());
-                    }catch (Exception e){
-                        log.error(e.getMessage());
-                        funDis.apply(null);
-                    }
-                    finally {
-                        nettyClient.stop();
-                    }
-                });
+            var user = new UserCloud(loginTextField.getText(), passTextField.getText());
+            nettyClient = new NettyClient(
+                    hostTextField.getText(),
+                    Integer.parseInt(portTextField.getText()),
+                    filesListServer,
+                    filesListClient,
+                    localAddressTextField
+            );
+            CompletableFuture.runAsync(() -> {
+                try {
+                    nettyClient.run(funCon,user);
+                } catch (java.net.ConnectException e) {
+                    log.error(e.getMessage());
+                } catch (Exception e) {
+                    log.error(e.getMessage());
+                    funDis.apply(null);
+                } finally {
+                    nettyClient.stop();
+                }
+            });
         });
 
         disconnectButton.setOnAction(event -> {

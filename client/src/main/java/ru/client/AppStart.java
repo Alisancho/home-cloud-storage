@@ -8,6 +8,7 @@ import javafx.scene.Parent;
 import ru.client.controller.MainController;
 
 import java.io.IOException;
+import java.sql.DatabaseMetaData;
 
 /**
  * VM options
