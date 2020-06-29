@@ -51,11 +51,13 @@ public class NettyClient {
                     }
                 })
                 .connect(host, port);
-        f.apply(null);
-        bootstrap.sync()
+
+        var localVar = bootstrap.sync()
                 .channel()
-                .closeFuture()
-                .sync();
+                .closeFuture();
+        f.apply(null);
+        localVar.sync();
+
         throw new RuntimeException("Разрыв соединения");
     }
 

@@ -183,12 +183,14 @@ public class MainController implements MainCiontrollerInt {
                 CompletableFuture.runAsync(() -> {
                     try {
                         nettyClient.run(funCon);
-                    } catch (Exception e) {
+                    } catch (java.net.ConnectException e) {
                         log.error(e.getMessage());
-
-                    }finally {
-                        nettyClient.stop();
+                    }catch (Exception e){
+                        log.error(e.getMessage());
                         funDis.apply(null);
+                    }
+                    finally {
+                        nettyClient.stop();
                     }
                 });
         });
