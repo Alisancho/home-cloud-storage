@@ -44,9 +44,13 @@ public class WorkWithFilesServiceImpl {
     public static void getFiles(final @NotNull ObservableList<OneFileFX> obList,
                                 final @NotNull Set<OneServerFile> fileSet) {
         CompletableFuture.runAsync(() -> {
-            obList.remove(0, obList.size());
-            fileSet.forEach(l ->
-                    obList.add(new OneFileFX(l.fileType(), l.nameFile(), l.sizeFile())));
+            Platform.runLater(
+                    () -> {
+                        obList.remove(0, obList.size());
+                        fileSet.forEach(l ->
+                                obList.add(new OneFileFX(l.fileType(), l.nameFile(), l.sizeFile())));
+                    }
+            );
         });
     }
 }
