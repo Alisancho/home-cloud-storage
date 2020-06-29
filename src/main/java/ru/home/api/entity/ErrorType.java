@@ -2,8 +2,6 @@ package ru.home.api.entity;
 
 import org.jetbrains.annotations.NotNull;
 
-import java.io.Serializable;
-
 public enum ErrorType implements NettyMess {
     ERROR_NO("Успех"),
     AUTH_OK("Успешная авторизация"),

@@ -1,14 +1,9 @@
 package ru.client.core;
 
 import com.jfoenix.controls.JFXButton;
-import com.jfoenix.controls.JFXTreeTableView;
-import io.vavr.Function3;
-import io.vavr.Function4;
-import io.vavr.Function7;
 import io.vavr.Function8;
 import javafx.application.Platform;
 import javafx.collections.ObservableList;
-import javafx.fxml.FXML;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import ru.client.entity.OneFileFX;

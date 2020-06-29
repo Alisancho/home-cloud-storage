@@ -3,11 +3,8 @@ package ru.cloud.service;
 import org.jetbrains.annotations.NotNull;
 import ru.cloud.service.db.UserTable;
 import ru.home.api.entity.auth.UserCloud;
-
-import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 /**
  * Заглушка

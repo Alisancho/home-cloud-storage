@@ -5,10 +5,8 @@ import javafx.scene.Scene;
 import javafx.stage.Stage;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
-import ru.client.controller.MainController;
 
 import java.io.IOException;
-import java.sql.DatabaseMetaData;
 
 /**
  * VM options
