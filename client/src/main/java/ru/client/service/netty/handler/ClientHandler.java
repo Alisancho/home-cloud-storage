@@ -37,10 +37,6 @@ public class ClientHandler extends ChannelInboundHandlerAdapter {
         this.localAddressTextField = localAddressTextField;
     }
 
-    public void stop() {
-        this.ctxMain.close();
-    }
-
     public void sendMessage(@NotNull final NettyMess msgToSend) {
         if (this.ctxMain != null) {
             this.ctxMain.writeAndFlush(msgToSend);

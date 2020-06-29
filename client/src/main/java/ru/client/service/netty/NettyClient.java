@@ -56,7 +56,6 @@ public class NettyClient {
         var localVar = bootstrap.sync()
                 .channel()
                 .closeFuture();
-log.info(userCloud.toString());
         sendMess(userCloud);
         f.apply(null);
         localVar.sync();
