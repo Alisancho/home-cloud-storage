@@ -24,9 +24,12 @@ import ru.home.api.entity.data.OneTask;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.Arrays;
 import java.util.ResourceBundle;
 import java.util.concurrent.CompletableFuture;
+import java.util.stream.Collector;
 
+import static java.util.stream.Collectors.toList;
 import static ru.home.api.entity.TaskType.*;
 
 @Slf4j
@@ -204,7 +207,15 @@ public class MainController implements MainCiontrollerInt {
         });
 
         upButton.setOnAction(event -> {
-            nettyClient.sendMess(new OneTask(OPTIONS, Option.none(), Option.none()));
+            final var list1 = Arrays.stream(localAddressTextField.getText().split("/"))
+                    .filter(d -> !d.equals(""))
+                    .collect(toList());
+            if (list1.size() != 0) {
+                list1.remove(list1.size() - 1);
+                final var listNew = list1.stream().map(v -> "/" + v).reduce((s1, s2) -> s1 + s2).orElse("/");
+                localAddressTextField.setText(listNew);
+                WorkWithFilesServiceImpl.getFiles(filesListClient, localAddressTextField.getText());
+            }
         });
 
         goToCatalog.setOnAction(event -> {

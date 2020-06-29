@@ -5,6 +5,7 @@ import java.util.Arrays;
 import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 
+import javafx.application.Platform;
 import javafx.collections.ObservableList;
 import org.jetbrains.annotations.NotNull;
 import ru.home.api.entity.catalog.FileType;
@@ -21,8 +22,12 @@ public class WorkWithFilesServiceImpl {
             try {
                 obList.remove(0, obList.size());
                 final var files = new File(filePath).listFiles();
-                Arrays.stream(files).forEach(file ->
-                        obList.add(new OneFileFX(FileType.getTypeFile(file), file.getName(), String.format("%.2f", (double) file.length() / 1024) + " kb"))
+                Platform.runLater(
+                        () -> {
+                            Arrays.stream(files).forEach(file ->
+                                    obList.add(new OneFileFX(FileType.getTypeFile(file), file.getName(), String.format("%.2f", (double) file.length() / 1024) + " kb"))
+                            );
+                        }
                 );
             } catch (Exception e) {
                 e.printStackTrace();
