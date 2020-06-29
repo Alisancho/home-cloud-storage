@@ -21,7 +21,7 @@ public class AppStart extends Application {
         final Parent panel = FXMLLoader.load(getClass().getResource("/sample.fxml"));
         final Scene scene = new Scene(panel, 1200, 700);
         stage.setTitle("Client cloud");
-//        scene.getStylesheets().add(getClass().getResource("/fontstyle.css").toExternalForm());
+        scene.getStylesheets().add(getClass().getResource("/fontstyle.css").toExternalForm());
         stage.setScene(scene);
         stage.setResizable(false);
         stage.show();
