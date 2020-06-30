@@ -9,7 +9,6 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
-import javafx.scene.control.TableRow;
 import javafx.scene.control.TreeItem;
 import javafx.scene.control.TreeTableColumn;
 import javafx.scene.input.MouseButton;
@@ -31,14 +30,13 @@ import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.ResourceBundle;
 import java.util.concurrent.CompletableFuture;
-import java.util.stream.Collector;
 
 import static java.util.stream.Collectors.toList;
 import static ru.home.api.entity.TaskType.*;
 
 @Slf4j
 public class MainController implements MainCiontrollerInt {
-    public static NettyClient nettyClient;
+    public static Option<NettyClient> nettyClient = Option.none();
 
     final private ObservableList<OneFileFX> filesListClient = FXCollections.observableArrayList();
     final private TreeItem<OneFileFX> rootClient = new RecursiveTreeItem<OneFileFX>(filesListClient, RecursiveTreeObject::getChildren);
@@ -185,29 +183,29 @@ public class MainController implements MainCiontrollerInt {
                 final var user = new UserCloud(loginTextField.getText(), passTextField.getText());
                 CompletableFuture.runAsync(() -> {
                     try {
-                        nettyClient = new NettyClient(
+                        nettyClient = Option.of(new NettyClient(
                                 hostTextField.getText(),
                                 Integer.parseInt(portTextField.getText()),
                                 filesListServer,
                                 filesListClient,
                                 localAddressTextField,
                                 funCon
-                        );
-                        nettyClient.run(user);
+                        ));
+                        nettyClient.get().run(user);
                     } catch (java.net.ConnectException e) {
                         log.error(e.getMessage());
                     } catch (Exception e) {
                         log.error(e.getMessage());
                         funDis.apply(null);
                     } finally {
-                        nettyClient.stop();
+                        nettyClient.get().stop();
                     }
                 });
             }
         });
 
         disconnectButton.setOnAction(event -> {
-            nettyClient.stop();
+            nettyClient.get().stop();
         });
 
         upButton.setOnAction(event -> {
@@ -232,7 +230,7 @@ public class MainController implements MainCiontrollerInt {
                 final var fileLocal = tableHome.getSelectionModel().getSelectedItem().getValue();
                 if (fileLocal.fileType.get().equals("FILE")) {
                     final var arrB = Files.readAllBytes(Paths.get(localAddressTextField.getText() + "/" + fileLocal.fileName.get()));
-                    nettyClient.sendMess(
+                    nettyClient.get().sendMess(
                             new OneTask(PUT, Option.of(fileLocal.fileName.get()), Option.of(arrB))
                     );
                 }
@@ -245,7 +243,7 @@ public class MainController implements MainCiontrollerInt {
             try {
                 final var fileLocal = tableServer.getSelectionModel().getSelectedItem().getValue();
                 if (fileLocal.fileType.get().equals("FILE")) {
-                    nettyClient.sendMess(
+                    nettyClient.get().sendMess(
                             new OneTask(GET, Option.of(fileLocal.fileName.get()), Option.none())
                     );
                 }
@@ -255,9 +253,13 @@ public class MainController implements MainCiontrollerInt {
         });
 
         deleteFromServerButton.setOnAction(event -> {
-            nettyClient.sendMess(
-                    new OneTask(DELETE, Option.of(tableServer.getSelectionModel().getSelectedItem().getValue().fileName.get()), Option.none())
-            );
+            try {
+                final var fileName = tableServer.getSelectionModel().getSelectedItem().getValue().fileName.get();
+                nettyClient.get().sendMess(
+                        new OneTask(DELETE, Option.of(fileName), Option.none())
+                );
+            } catch (Exception ignored) {
+            }
         });
 
         deleteFileClientButton.setOnAction(event -> {

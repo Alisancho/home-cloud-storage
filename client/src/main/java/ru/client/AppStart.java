@@ -5,6 +5,8 @@ import javafx.scene.Scene;
 import javafx.stage.Stage;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
+import ru.client.controller.MainController;
+import ru.client.service.netty.NettyClient;
 
 import java.io.IOException;
 
@@ -32,7 +34,8 @@ public class AppStart extends Application {
     }
 
     @Override
-    protected Object clone() throws CloneNotSupportedException {
-        return super.clone();
+    public void stop() throws Exception {
+        MainController.nettyClient.forEach(NettyClient::stop);
+        super.stop();
     }
 }
