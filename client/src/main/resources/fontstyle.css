@@ -21,7 +21,7 @@
     -fx-border-color: rgb(0, 0, 0);
 }
 
-.button{
+.button {
     /*-fx-background-color: #4CAF50; !* Green *!*/
     -fx-border: none;
     -fx-color: white;

@@ -7,9 +7,13 @@ import io.vavr.control.Option;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.event.EventHandler;
 import javafx.fxml.FXML;
+import javafx.scene.control.TableRow;
 import javafx.scene.control.TreeItem;
 import javafx.scene.control.TreeTableColumn;
+import javafx.scene.input.MouseButton;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.util.Callback;
@@ -265,6 +269,23 @@ public class MainController implements MainCiontrollerInt {
                 e.printStackTrace();
             }
         });
+        tableHome.setOnMouseClicked(new EventHandler<MouseEvent>() {
+            @Override
+            public void handle(MouseEvent mouseEvent) {
+                if (mouseEvent.getButton().equals(MouseButton.PRIMARY)) {
+                    if (mouseEvent.getClickCount() == 2) {
+                        final var fileLocal = tableHome.getSelectionModel().getSelectedItem().getValue();
+                        if (fileLocal.fileType.get().equals("DIRECTORY")) {
+                            final var newString = localAddressTextField.getText() + "/" + fileLocal.fileName.get();
+                            localAddressTextField.setText(newString);
+                            WorkWithFilesServiceImpl.getFiles(filesListClient, localAddressTextField.getText());
+                        }
+
+                    }
+                }
+            }
+        });
+
         WorkWithFilesServiceImpl.getFiles(filesListClient, localAddressTextField.getText());
     }
 }
