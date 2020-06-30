@@ -101,16 +101,5 @@
             <artifactId>jfoenix</artifactId>
             <version>9.0.10</version>
         </dependency>
-        <dependency>
-            <groupId>net.logstash.logback</groupId>
-            <artifactId>logstash-logback-encoder</artifactId>
-            <version>5.2</version>
-        </dependency>
-        <!-- Your project must also directly depend on either logback-classic or logback-access. For example: -->
-        <dependency>
-            <groupId>ch.qos.logback</groupId>
-            <artifactId>logback-classic</artifactId>
-            <version>1.2.3</version>
-        </dependency>
     </dependencies>
 </project>

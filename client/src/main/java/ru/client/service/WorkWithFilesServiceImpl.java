@@ -5,6 +5,7 @@ import java.util.Arrays;
 import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 
+import javafx.application.Platform;
 import javafx.collections.ObservableList;
 import org.jetbrains.annotations.NotNull;
 import ru.home.api.entity.catalog.FileType;
@@ -21,8 +22,12 @@ public class WorkWithFilesServiceImpl {
             try {
                 obList.remove(0, obList.size());
                 final var files = new File(filePath).listFiles();
-                Arrays.stream(files).forEach(file ->
-                        obList.add(new OneFileFX(FileType.getTypeFile(file), file.getName(), String.format("%.2f", (double) file.length() / 1024) + " kb"))
+                Platform.runLater(
+                        () -> {
+                            Arrays.stream(files).forEach(file ->
+                                    obList.add(new OneFileFX(FileType.getTypeFile(file), file.getName(), String.format("%.2f", (double) file.length() / 1024) + " kb"))
+                            );
+                        }
                 );
             } catch (Exception e) {
                 e.printStackTrace();
@@ -39,9 +44,13 @@ public class WorkWithFilesServiceImpl {
     public static void getFiles(final @NotNull ObservableList<OneFileFX> obList,
                                 final @NotNull Set<OneServerFile> fileSet) {
         CompletableFuture.runAsync(() -> {
-            obList.remove(0, obList.size());
-            fileSet.forEach(l ->
-                    obList.add(new OneFileFX(l.fileType(), l.nameFile(), l.sizeFile())));
+            Platform.runLater(
+                    () -> {
+                        obList.remove(0, obList.size());
+                        fileSet.forEach(l ->
+                                obList.add(new OneFileFX(l.fileType(), l.nameFile(), l.sizeFile())));
+                    }
+            );
         });
     }
 }

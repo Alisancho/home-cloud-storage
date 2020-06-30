@@ -1,23 +1,21 @@
 package ru.cloud.service;
 
+import org.jetbrains.annotations.NotNull;
+import ru.cloud.service.db.UserTable;
 import ru.home.api.entity.auth.UserCloud;
-
-import java.util.Map;
+import java.util.Optional;
+import java.util.Set;
 
 /**
  * Заглушка
  */
 public class DataBaseServiceImpl {
-    private final Map<String, String> mapUsers = Map.of(
-            "admin", "qwerty1234",
-            "user1", "user1"
+    private static final Set<UserTable> usersTable = Set.of(
+            new UserTable("admin", "qwerty1234", System.getProperty("user.dir") + "/server/src/main/resources/storage/admin"),
+            new UserTable("user1", "user1", System.getProperty("user.dir") + "/server/src/main/resources/storage/user")
     );
 
-    public Boolean userIsReal(final UserCloud userCloud) {
-        if (mapUsers.containsKey(userCloud.login())) {
-            final var localPass = mapUsers.get(userCloud.login());
-            return localPass.equals(userCloud.pass());
-        }
-        return false;
+    public static Optional<UserTable> userIsReal(@NotNull final UserCloud userCloud) {
+       return usersTable.stream().filter(o -> o.login().equals(userCloud.login()) & o.pass().equals(userCloud.pass())).findFirst();
     }
 }

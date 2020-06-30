@@ -6,6 +6,7 @@ import javafx.stage.Stage;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import ru.client.controller.MainController;
+import ru.client.service.netty.NettyClient;
 
 import java.io.IOException;
 
@@ -22,7 +23,7 @@ public class AppStart extends Application {
         final Parent panel = FXMLLoader.load(getClass().getResource("/sample.fxml"));
         final Scene scene = new Scene(panel, 1200, 700);
         stage.setTitle("Client cloud");
-//        scene.getStylesheets().add(getClass().getResource("/fontstyle.css").toExternalForm());
+        scene.getStylesheets().add(getClass().getResource("/fontstyle.css").toExternalForm());
         stage.setScene(scene);
         stage.setResizable(false);
         stage.show();
@@ -33,7 +34,8 @@ public class AppStart extends Application {
     }
 
     @Override
-    protected Object clone() throws CloneNotSupportedException {
-        return super.clone();
+    public void stop() throws Exception {
+        MainController.nettyClient.forEach(NettyClient::stop);
+        super.stop();
     }
 }
