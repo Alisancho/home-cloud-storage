@@ -50,14 +50,6 @@ public class ClientHandler extends ChannelInboundHandlerAdapter {
         }
     }
 
-    public void sendMessage(@NotNull final ByteString msgToSend) {
-        if (this.ctxMain != null) {
-            this.ctxMain.writeAndFlush(msgToSend);
-        } else {
-            log.info("ctx not initialized yet. you were too fast. do something here");
-        }
-    }
-
     @Override
     public void channelActive(ChannelHandlerContext ctxL) throws Exception {
         log.info("Client channelActive");
