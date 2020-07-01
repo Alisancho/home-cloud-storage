@@ -30,10 +30,7 @@ public class Functions {
         );
         return Void.TYPE;
     };
-    /**
-     * Функция для заполнетни таблиц
-     * М для промежуточний данныз
-     */
+
     public static Function8<JFXButton, JFXButton, JFXButton, HBox, JFXButton, ObservableList<OneFileFX>, VBox, Throwable, Class<Void>> functionDisconnection = (putToServerButton, getFromServerButton, deleteFromServerButton, mainBox, disconnectButton, filesListServer, sbur, error) -> {
         Platform.runLater(
                 () -> {
@@ -51,6 +48,9 @@ public class Functions {
 
     /**
      * Заполняем таблицу клиента
+     *
+     * @param obList
+     * @param filePath
      */
     public static void getFiles(final @NotNull ObservableList<OneFileFX> obList,
                                 final @NotNull String filePath) {

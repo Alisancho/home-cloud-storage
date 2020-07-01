@@ -66,9 +66,7 @@ public class ClientHandler extends ChannelInboundHandlerAdapter {
 
     @Override
     public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
-        log.info("Получин ответ от сервера");
         ctxMain = ctx;
-        log.info("Новое сообщение на клиент");
         if (msg instanceof ContentsDirectory contentsDirectory) {
             log.info("Получен список файлов" + contentsDirectory.toString());
             Functions.getFiles(filesListServer, contentsDirectory.files());
@@ -112,7 +110,7 @@ public class ClientHandler extends ChannelInboundHandlerAdapter {
 
     @Override
     public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
-        log.info("Client exceptionCaught");
+        log.info("Client exceptionCaught " + cause.getMessage());
         cause.printStackTrace();
         ctx.close();
     }

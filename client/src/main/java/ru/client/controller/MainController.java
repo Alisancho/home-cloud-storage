@@ -286,6 +286,7 @@ public class MainController {
                 e.printStackTrace();
             }
         });
+
         tableHome.setOnMouseClicked(new EventHandler<MouseEvent>() {
             @Override
             public void handle(MouseEvent mouseEvent) {
