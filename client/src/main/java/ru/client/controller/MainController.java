@@ -18,7 +18,6 @@ import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
-import javafx.stage.Window;
 import javafx.util.Callback;
 import lombok.extern.slf4j.Slf4j;
 import ru.client.core.Functions;
@@ -234,7 +233,11 @@ public class MainController {
         putToServerButton.setOnAction(event -> {
             try {
                 final var fileLocal = tableHome.getSelectionModel().getSelectedItem().getValue();
-                if (fileLocal.fileType.get().equals("FILE")) {
+                final var bool = filesListServer.stream()
+                        .filter(o -> o.fileName.getValue().equals(fileLocal.fileName.get()))
+                        .collect(toList());
+
+                if (fileLocal.fileType.get().equals("FILE") && bool.size() == 0) {
                     final var file = Paths.get(localAddressTextField.getText() + "/" + fileLocal.fileName.get());
                     CompletableFuture.runAsync(() -> {
                         FileIO.fromPath(file)
@@ -248,7 +251,7 @@ public class MainController {
                                 e.printStackTrace();
                             }
                         });
-                    });
+                    }).join();
                 }
             } catch (Exception e) {
                 e.printStackTrace();
