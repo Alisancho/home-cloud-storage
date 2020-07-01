@@ -35,6 +35,7 @@ public class AppStart extends Application {
 
     @Override
     public void stop() throws Exception {
+        MainController.actorSystem.terminate();
         MainController.nettyClient.forEach(NettyClient::stop);
         super.stop();
     }

@@ -1,5 +1,8 @@
 package ru.client.controller;
 
+import akka.actor.ActorSystem;
+import akka.stream.javadsl.FileIO;
+import akka.stream.javadsl.Sink;
 import com.jfoenix.controls.*;
 import com.jfoenix.controls.datamodels.treetable.RecursiveTreeObject;
 import io.vavr.Function1;
@@ -19,7 +22,6 @@ import javafx.util.Callback;
 import lombok.extern.slf4j.Slf4j;
 import ru.client.core.Functions;
 import ru.client.entity.OneFileFX;
-import ru.client.service.WorkWithFilesServiceImpl;
 import ru.client.service.netty.NettyClient;
 import ru.home.api.entity.auth.UserCloud;
 import ru.home.api.entity.data.OneTask;
@@ -35,20 +37,22 @@ import static java.util.stream.Collectors.toList;
 import static ru.home.api.entity.TaskType.*;
 
 @Slf4j
-public class MainController implements MainCiontrollerInt {
+public class MainController {
+
+    public static final ActorSystem actorSystem = ActorSystem.create("myapp-actorsys");
     public static Option<NettyClient> nettyClient = Option.none();
 
     final private ObservableList<OneFileFX> filesListClient = FXCollections.observableArrayList();
     final private TreeItem<OneFileFX> rootClient = new RecursiveTreeItem<OneFileFX>(filesListClient, RecursiveTreeObject::getChildren);
-    final private JFXTreeTableColumn<OneFileFX, String> typeColClient = new JFXTreeTableColumn<>(COL_1);
-    final private JFXTreeTableColumn<OneFileFX, String> nameColClient = new JFXTreeTableColumn<>(COL_2);
-    final private JFXTreeTableColumn<OneFileFX, String> sizeColClient = new JFXTreeTableColumn<>(COL_3);
+    final private JFXTreeTableColumn<OneFileFX, String> typeColClient = new JFXTreeTableColumn<>("Type");
+    final private JFXTreeTableColumn<OneFileFX, String> nameColClient = new JFXTreeTableColumn<>("File name");
+    final private JFXTreeTableColumn<OneFileFX, String> sizeColClient = new JFXTreeTableColumn<>("Size");
 
     final private ObservableList<OneFileFX> filesListServer = FXCollections.observableArrayList();
     final private TreeItem<OneFileFX> rootServer = new RecursiveTreeItem<OneFileFX>(filesListServer, RecursiveTreeObject::getChildren);
-    final private JFXTreeTableColumn<OneFileFX, String> typeColServer = new JFXTreeTableColumn<>(COL_1);
-    final private JFXTreeTableColumn<OneFileFX, String> nameColServer = new JFXTreeTableColumn<>(COL_2);
-    final private JFXTreeTableColumn<OneFileFX, String> sizeColServer = new JFXTreeTableColumn<>(COL_3);
+    final private JFXTreeTableColumn<OneFileFX, String> typeColServer = new JFXTreeTableColumn<>("Type");
+    final private JFXTreeTableColumn<OneFileFX, String> nameColServer = new JFXTreeTableColumn<>("File name");
+    final private JFXTreeTableColumn<OneFileFX, String> sizeColServer = new JFXTreeTableColumn<>("Size");
 
     @FXML
     private JFXButton putToServerButton;
@@ -106,6 +110,7 @@ public class MainController implements MainCiontrollerInt {
 
     @FXML
     void initialize() throws InterruptedException {
+
         Function1<Throwable, Class<Void>> funDis = Functions.functionDisconnection.apply(putToServerButton, getFromServerButton, deleteFromServerButton, mainBox, disconnectButton, filesListServer, sbur);
         Function1<Throwable, Class<Void>> funCon = Functions.functionConnection.apply(putToServerButton, getFromServerButton, deleteFromServerButton, mainBox, disconnectButton, filesListServer, sbur);
 
@@ -216,23 +221,37 @@ public class MainController implements MainCiontrollerInt {
                 list1.remove(list1.size() - 1);
                 final var listNew = list1.stream().map(v -> "/" + v).reduce((s1, s2) -> s1 + s2).orElse("/");
                 localAddressTextField.setText(listNew);
-                WorkWithFilesServiceImpl.getFiles(filesListClient, localAddressTextField.getText());
+                Functions.getFiles(filesListClient, localAddressTextField.getText());
             }
         });
 
         goToCatalog.setOnAction(event -> {
-            WorkWithFilesServiceImpl.getFiles(filesListClient, localAddressTextField.getText());
+            Functions.getFiles(filesListClient, localAddressTextField.getText());
         });
 
 
         putToServerButton.setOnAction(event -> {
             try {
                 final var fileLocal = tableHome.getSelectionModel().getSelectedItem().getValue();
-                if (fileLocal.fileType.get().equals("FILE")) {
-                    final var arrB = Files.readAllBytes(Paths.get(localAddressTextField.getText() + "/" + fileLocal.fileName.get()));
-                    nettyClient.get().sendMess(
-                            new OneTask(PUT, Option.of(fileLocal.fileName.get()), Option.of(arrB))
-                    );
+                final var bool = filesListServer.stream()
+                        .filter(o -> o.fileName.getValue().equals(fileLocal.fileName.get()))
+                        .collect(toList());
+
+                if (fileLocal.fileType.get().equals("FILE") && bool.size() == 0) {
+                    final var file = Paths.get(localAddressTextField.getText() + "/" + fileLocal.fileName.get());
+                    CompletableFuture.runAsync(() -> {
+                        FileIO.fromPath(file)
+                                .map(l -> new OneTask(PUT, Option.of(fileLocal.fileName.get()), Option.of(l), Option.none()))
+                                .to(Sink.foreach(p -> nettyClient.get().sendMess(p)))
+                                .run(actorSystem).toCompletableFuture().thenRun(() -> {
+                            try {
+                                Thread.sleep(1000);
+                                nettyClient.get().sendMess(new OneTask(OPTIONS, Option.none(), Option.none(), Option.none()));
+                            } catch (InterruptedException e) {
+                                e.printStackTrace();
+                            }
+                        });
+                    }).join();
                 }
             } catch (Exception e) {
                 e.printStackTrace();
@@ -242,9 +261,12 @@ public class MainController implements MainCiontrollerInt {
         getFromServerButton.setOnAction(event -> {
             try {
                 final var fileLocal = tableServer.getSelectionModel().getSelectedItem().getValue();
-                if (fileLocal.fileType.get().equals("FILE")) {
+                final var bool = filesListClient.stream()
+                        .filter(o -> o.fileName.getValue().equals(fileLocal.fileName.get()))
+                        .collect(toList());
+                if (fileLocal.fileType.get().equals("FILE") & bool.size() == 0) {
                     nettyClient.get().sendMess(
-                            new OneTask(GET, Option.of(fileLocal.fileName.get()), Option.none())
+                            new OneTask(GET, Option.of(fileLocal.fileName.get()), Option.none(), Option.of(localAddressTextField.getText()))
                     );
                 }
             } catch (Exception e) {
@@ -256,7 +278,7 @@ public class MainController implements MainCiontrollerInt {
             try {
                 final var fileName = tableServer.getSelectionModel().getSelectedItem().getValue().fileName.get();
                 nettyClient.get().sendMess(
-                        new OneTask(DELETE, Option.of(fileName), Option.none())
+                        new OneTask(DELETE, Option.of(fileName), Option.none(), Option.none())
                 );
             } catch (Exception ignored) {
             }
@@ -266,11 +288,12 @@ public class MainController implements MainCiontrollerInt {
             try {
                 final var fileLocal = tableHome.getSelectionModel().getSelectedItem().getValue();
                 Files.delete(Paths.get(localAddressTextField.getText() + "/" + fileLocal.fileName.get()));
-                WorkWithFilesServiceImpl.getFiles(filesListClient, localAddressTextField.getText());
+                Functions.getFiles(filesListClient, localAddressTextField.getText());
             } catch (IOException e) {
                 e.printStackTrace();
             }
         });
+
         tableHome.setOnMouseClicked(new EventHandler<MouseEvent>() {
             @Override
             public void handle(MouseEvent mouseEvent) {
@@ -280,7 +303,7 @@ public class MainController implements MainCiontrollerInt {
                         if (fileLocal.fileType.get().equals("DIRECTORY")) {
                             final var newString = localAddressTextField.getText() + "/" + fileLocal.fileName.get();
                             localAddressTextField.setText(newString);
-                            WorkWithFilesServiceImpl.getFiles(filesListClient, localAddressTextField.getText());
+                            Functions.getFiles(filesListClient, localAddressTextField.getText());
                         }
 
                     }
@@ -288,6 +311,6 @@ public class MainController implements MainCiontrollerInt {
             }
         });
 
-        WorkWithFilesServiceImpl.getFiles(filesListClient, localAddressTextField.getText());
+        Functions.getFiles(filesListClient, localAddressTextField.getText());
     }
 }

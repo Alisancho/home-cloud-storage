@@ -1,9 +1,12 @@
 package ru.cloud.service.netty.handler;
 
+import akka.stream.javadsl.FileIO;
+import akka.stream.javadsl.Sink;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
 import io.vavr.control.Option;
 import lombok.extern.slf4j.Slf4j;
+import ru.cloud.AppStart;
 import ru.cloud.service.DataBaseServiceImpl;
 import ru.cloud.service.db.UserTable;
 import ru.home.api.entity.auth.UserCloud;
@@ -15,12 +18,13 @@ import ru.home.api.entity.data.OneTask;
 import java.io.File;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.nio.file.StandardOpenOption;
 import java.util.Arrays;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import static java.nio.file.StandardOpenOption.*;
 import static ru.home.api.entity.ErrorType.*;
+import static ru.home.api.entity.TaskType.*;
 
 @Slf4j
 public class MessHandler extends ChannelInboundHandlerAdapter {
@@ -51,9 +55,19 @@ public class MessHandler extends ChannelInboundHandlerAdapter {
             switch (oneTask.task()) {
                 case GET -> {
                     try {
-                        log.info(oneTask.task().taskType());
-                        final var arrB = Files.readAllBytes(Paths.get(userTable.get().refRep() + "/" + oneTask.fileName().get()));
-                        ctx.writeAndFlush(new OneTask(oneTask.task(), oneTask.fileName(), Option.of(arrB)));
+                        final var path = Paths.get(userTable.get().refRep() + "/" + oneTask.fileName().get());
+                        FileIO.fromPath(path)
+                                .map(l -> new OneTask(GET, oneTask.fileName(), Option.of(l), oneTask.path()))
+                                .to(Sink.foreach(ctx::writeAndFlush))
+                                .run(AppStart.actorSystem).toCompletableFuture().thenRun(() -> {
+                            try {
+                                Thread.sleep(1000);
+                            } catch (InterruptedException e) {
+                                e.printStackTrace();
+                            }
+                            ctx.writeAndFlush(new OneTask(OPTIONS, oneTask.fileName(), Option.none(), oneTask.path()));
+                        });
+
                     } catch (Exception e) {
                         e.printStackTrace();
                         ctx.writeAndFlush(ERROR_NO_FILE);
@@ -61,8 +75,7 @@ public class MessHandler extends ChannelInboundHandlerAdapter {
                 }
                 case PUT -> {
                     log.info(oneTask.task().taskType());
-                    Files.write(Paths.get(userTable.get().refRep() + "/" + oneTask.fileName().get()), oneTask.data().get(), StandardOpenOption.CREATE);
-                    ctx.writeAndFlush(ERROR_NO);
+                    Files.write(Paths.get(userTable.get().refRep() + "/" + oneTask.fileName().get()), oneTask.byteString().get().toArray(), CREATE, WRITE, APPEND);
                 }
                 case DELETE -> {
                     log.info(oneTask.task().taskType());
@@ -95,6 +108,7 @@ public class MessHandler extends ChannelInboundHandlerAdapter {
 
     @Override
     public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
+        cause.printStackTrace();
         log.error("Ошибка в MessHandler - " + cause.getMessage());
         ctx.close();
     }
