@@ -1,37 +1,30 @@
 #formAuth {
-    /*-fx-background-color: rgb(0, 191, 192);*/
-
-    -fx-background-color: linear-gradient(rgb(0, 191, 192), rgb(0, 126, 137));
+    -fx-background-color: linear-gradient(#46cccd 3%,#6957ca);
 }
 
 #sbur, #mainBox {
-    /*-fx-background-color: rgb(0, 126, 123);*/
-    -fx-background-color: linear-gradient(rgb(0, 126, 123), rgb(0, 126, 130));
+    -fx-background-color: linear-gradient(#46cccd,#6957ca);
 }
 
 #tableServer, #tableHome {
-    -fx-background-color: rgb(234, 193, 191);
+    -fx-background-color: #46cccd;
     -fx-text-align: center;
     -fx-text-decoration: none;
     -fx-display: inline-block;
 }
 
 .tree-table-view .column-header {
-    /*-fx-border-color: rgb(234, 193, 191);*/
-    -fx-background-color: linear-gradient(rgb(234, 193, 191), rgb(234, 193, 198));
+    -fx-background-color: #46cccd;
 }
 
-.column-header-background {
-    -fx-border-color: rgb(0, 0, 0);
-}
+/*.column-header-background {*/
+/*    -fx-border-color: rgb(0, 0, 0);*/
+/*}*/
 
 .button {
-    /*-fx-background-color: #4CAF50; !* Green *!*/
     -fx-border: none;
     -fx-color: white;
-    /*-fx-padding: 20px 50px;*/
     -fx-text-align: center;
     -fx-text-decoration: none;
     -fx-display: inline-block;
-    /*-fx-font-size: 8px;*/
 }
