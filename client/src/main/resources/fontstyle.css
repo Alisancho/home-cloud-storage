@@ -1,5 +1,5 @@
 #formAuth {
-    -fx-background-color: linear-gradient(#46cccd 3%,#6957ca);
+    /*-fx-background-color: linear-gradient(#46cccd 3%,#6957ca);*/
 }
 
 #sbur, #mainBox {
@@ -16,7 +16,6 @@
 .tree-table-view .column-header {
     -fx-background-color: #46cccd;
 }
-
 /*.column-header-background {*/
 /*    -fx-border-color: rgb(0, 0, 0);*/
 /*}*/

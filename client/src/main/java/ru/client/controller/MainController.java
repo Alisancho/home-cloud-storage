@@ -110,7 +110,6 @@ public class MainController {
 
     @FXML
     void initialize() throws InterruptedException {
-
         Function1<Throwable, Class<Void>> funDis = Functions.functionDisconnection.apply(putToServerButton, getFromServerButton, deleteFromServerButton, mainBox, disconnectButton, filesListServer, sbur);
         Function1<Throwable, Class<Void>> funCon = Functions.functionConnection.apply(putToServerButton, getFromServerButton, deleteFromServerButton, mainBox, disconnectButton, filesListServer, sbur);
 
