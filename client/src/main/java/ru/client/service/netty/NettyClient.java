@@ -57,7 +57,7 @@ public class NettyClient {
         throw new RuntimeException("Разрыв соединения");
     }
 
-    public void sendMess(NettyMess msg) {
+    public void sendMess(@NotNull final NettyMess msg) {
         clientHandler.sendMessage(msg);
     }
 

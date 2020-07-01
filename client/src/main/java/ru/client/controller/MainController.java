@@ -18,6 +18,7 @@ import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
+import javafx.stage.Window;
 import javafx.util.Callback;
 import lombok.extern.slf4j.Slf4j;
 import ru.client.core.Functions;
@@ -242,10 +243,10 @@ public class MainController {
                                 .run(actorSystem).toCompletableFuture().thenRun(() -> {
                             try {
                                 Thread.sleep(1000);
+                                nettyClient.get().sendMess(new OneTask(OPTIONS, Option.none(), Option.none(), Option.none()));
                             } catch (InterruptedException e) {
                                 e.printStackTrace();
                             }
-                            nettyClient.get().sendMess(new OneTask(OPTIONS, Option.none(), Option.none(), Option.none()));
                         });
                     });
                 }
@@ -257,7 +258,10 @@ public class MainController {
         getFromServerButton.setOnAction(event -> {
             try {
                 final var fileLocal = tableServer.getSelectionModel().getSelectedItem().getValue();
-                if (fileLocal.fileType.get().equals("FILE")) {
+                final var bool = filesListClient.stream()
+                        .filter(o -> o.fileName.getValue().equals(fileLocal.fileName.get()))
+                        .collect(toList());
+                if (fileLocal.fileType.get().equals("FILE") & bool.size() == 0) {
                     nettyClient.get().sendMess(
                             new OneTask(GET, Option.of(fileLocal.fileName.get()), Option.none(), Option.of(localAddressTextField.getText()))
                     );
