@@ -74,7 +74,6 @@ public class MessHandler extends ChannelInboundHandlerAdapter {
                     }
                 }
                 case PUT -> {
-                    log.info(oneTask.task().taskType());
                     Files.write(Paths.get(userTable.get().refRep() + "/" + oneTask.fileName().get()), oneTask.byteString().get().toArray(), CREATE, WRITE, APPEND);
                 }
                 case DELETE -> {
