@@ -8,6 +8,7 @@
 
 #tableServer, #tableHome {
     -fx-background-color: #46cccd;
+    -fx-text-fill: green; -fx-font-size: 16px;
     -fx-text-align: center;
     -fx-text-decoration: none;
     -fx-display: inline-block;
@@ -21,6 +22,7 @@
 /*}*/
 
 .button {
+    /*-fx-text-fill: green; -fx-font-size: 16px;*/
     -fx-border: none;
     -fx-color: white;
     -fx-text-align: center;
