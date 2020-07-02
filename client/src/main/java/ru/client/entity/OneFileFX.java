@@ -7,7 +7,6 @@ import org.jetbrains.annotations.NotNull;
 import ru.home.api.entity.catalog.FileType;
 
 public class OneFileFX extends RecursiveTreeObject<OneFileFX> {
-
     public final StringProperty fileType;
     public final StringProperty fileName;
     public final StringProperty fileSize;

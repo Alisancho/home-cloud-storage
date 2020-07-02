@@ -1,6 +1,5 @@
 package ru.client.service.netty.handler;
 
-import akka.util.ByteString;
 import com.jfoenix.controls.JFXTextField;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
@@ -80,7 +79,6 @@ public class ClientHandler extends ChannelInboundHandlerAdapter {
                     log.error("Ошибка в сообщении");
                 }
             }
-
         }
         if (msg instanceof ErrorType errorType) {
             switch (errorType) {
