@@ -30,7 +30,6 @@ public class ClientHandler extends ChannelInboundHandlerAdapter {
     final private Function1<Throwable, Class<Void>> funOn;
     private ChannelHandlerContext ctxMain;
 
-
     public ClientHandler(@NotNull final ObservableList<OneFileFX> filesListServer,
                          @NotNull final ObservableList<OneFileFX> filesListClient,
                          @NotNull final JFXTextField localAddressTextField,

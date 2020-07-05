@@ -10,7 +10,6 @@ public enum TaskType implements NettyMess {
     private final String taskType;
 
     TaskType(final @NotNull String taskType) {
-
         this.taskType = taskType;
     }
 
