@@ -309,7 +309,6 @@ public class MainController {
                 }
             }
         });
-
         Functions.getFiles(filesListClient, localAddressTextField.getText());
     }
 }
