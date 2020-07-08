@@ -107,7 +107,6 @@ public class MessHandler extends ChannelInboundHandlerAdapter {
 
     @Override
     public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
-        cause.printStackTrace();
         log.error("Ошибка в MessHandler - " + cause.getMessage());
         ctx.close();
     }
